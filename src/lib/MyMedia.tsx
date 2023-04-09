@@ -21,42 +21,30 @@ export class MyMedia extends StreamEvents{
         this.vb = new VirtualBackground();
 
         const v = document.createElement("video");
-        v.autoplay = true;
         v.muted = true;
-        v.playsInline = true;
         v.width = 100;
         v.height = 100;
-//        v.style.display = "inline-block";
-        v.style.display = "none";
-        document.body.appendChild(v);
         this.video = v;
 
         const c = document.createElement("canvas");
         c.width = 100;
         c.height = 100;
-//        c.style.display = "inline-block";
-        c.style.display = "none";
-        document.body.appendChild(c);
         this.canvas = c;
         this.canvasStream = this.canvas.captureStream();
     }
 
     setStates(micOn: boolean, cameraOn: boolean, ){
-        console.log(`mic: ${micOn}, camera: ${cameraOn}`);
         this.resetMediaStream(micOn, cameraOn);
     }
     setMicState(on: boolean){
-        console.log(`mic: ${on}`);
         this.resetMediaStream(on, this.cameraOn);
     }
     setCameraState(on: boolean){
-        console.log(`camera: ${on}`);
         this.resetMediaStream(this.micOn, on);
     }
     private resetMediaStream(micOn: boolean, cameraOn: boolean){
         if(this.userMediaStream != null && this.micOn == micOn && this.cameraOn == cameraOn) return;
         if(this.cameraOn && !cameraOn){
-            console.log("stop video");
             this.userMediaStream?.getVideoTracks().forEach(t=>t.stop())
         }
 
@@ -85,6 +73,7 @@ export class MyMedia extends StreamEvents{
                 })
                 .catch(console.error);
         } else{
+            // camera/mic offの場合両方ダミーのストリームを使う実験。うまくいかないため現在は無効。
             console.log("both off");
             const s = new MediaStream();
             const ctx = new AudioContext();
@@ -92,10 +81,8 @@ export class MyMedia extends StreamEvents{
             const dst = oscillator.connect(ctx.createMediaStreamDestination());
             oscillator.start();
             const t = (dst as any).stream.getAudioTracks()[0];
-            console.log(t);
             s.addTrack(t);
-            const canvas = document.createElement("canvas");
-            s.addTrack(canvas.captureStream().getVideoTracks()[0]);
+            s.addTrack(this.canvasStream.getVideoTracks()[0]);
             this.dispatchEvent(new StreamAvailableEvent(s))
         }
     }
