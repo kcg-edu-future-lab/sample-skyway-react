@@ -1,4 +1,4 @@
-import { InputImage, InputMap, Results, SelfieSegmentation } from "@mediapipe/selfie_segmentation";
+import { InputImage, Results, SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import bgImagePath from "./defaultBackground.png";
 import { getTargetDrawingRect } from "./DrawUtil";
 

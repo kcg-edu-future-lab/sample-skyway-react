@@ -26,12 +26,7 @@ class WebRtcEvents extends EventTarget{
 }
 
 export class SkyWay extends WebRtcEvents{
-    getSelfStream(){
-        return this.selfStream;
-    }
-
     start(key: string, selfStream: MediaStream){
-        this.selfStream = selfStream;
         this.peer = new Peer({key: key}); //, debug: 3 });
         this.peer.on("open", async () => {
             console.log(`skyway roomに接続しました. あなたのpeerIdは${this.peer!.id}です.`);
@@ -44,8 +39,6 @@ export class SkyWay extends WebRtcEvents{
                 if(typeof(stream) === 'object'){
                     console.log(`OtherVideoを追加.`);
                     this.dispatchEvent(new PeerStreamArrivedEvent(stream.peerId, stream));
-                } else {
-                    console.log("peer streamなし");
                 }
             }).on("peerLeave", peerId=>{
                 this.dispatchEvent(new PeerStreamLeavedEvent(peerId));
@@ -59,11 +52,9 @@ export class SkyWay extends WebRtcEvents{
 
     replaceStream(stream: MediaStream){
         if(!this.room) return;
-        this.selfStream = stream;
         this.room.replaceStream(stream);
     }
 
-    private selfStream: MediaStream | null = null;
     private peer: Peer | null = null;
     private room: SfuRoom | null = null;
 }

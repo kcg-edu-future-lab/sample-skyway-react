@@ -43,7 +43,7 @@ export class MyMedia extends StreamEvents{
         this.resetMediaStream(this.micOn, on);
     }
     private resetMediaStream(micOn: boolean, cameraOn: boolean){
-        if(this.userMediaStream != null && this.micOn == micOn && this.cameraOn == cameraOn) return;
+        if(this.userMediaStream != null && this.micOn === micOn && this.cameraOn === cameraOn) return;
         if(this.cameraOn && !cameraOn){
             this.userMediaStream?.getVideoTracks().forEach(t=>t.stop())
         }
