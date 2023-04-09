@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { skyway as skywayKey } from '../keys';
+import { skyWayKey, skyWayRoomId } from '../keys';
 import { SkyWay } from '../lib/SkyWay';
 import { MyMedia } from '../lib/MyMedia';
 import SelfVideo from './SelfVideo';
@@ -31,7 +31,7 @@ function App() {
                 sw.on("peerStreamLeaved", ({peerId})=>{
                     setPeers(peers.filter(s=>s.peerId!==peerId));
                 });
-                sw.start(skywayKey, stream);
+                sw.start(skyWayKey, skyWayRoomId, stream);
                 skyWay.current = sw;
             } else{
                 skyWay.current.replaceStream(stream);

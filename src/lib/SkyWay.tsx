@@ -26,12 +26,12 @@ class WebRtcEvents extends EventTarget{
 }
 
 export class SkyWay extends WebRtcEvents{
-    start(key: string, selfStream: MediaStream){
+    start(key: string, roomId: string, selfStream: MediaStream){
         this.peer = new Peer({key: key}); //, debug: 3 });
         this.peer.on("open", async () => {
             console.log(`skyway roomに接続しました. あなたのpeerIdは${this.peer!.id}です.`);
             this.room = this.peer!.joinRoom(
-                "room1", {mode: "sfu", stream: selfStream}
+                roomId, {mode: "sfu", stream: selfStream}
             ).on('peerJoin', peerId=>{
                 console.log(`skyway roomに${peerId}が参加しました.`);
             }).on("stream", stream=>{
