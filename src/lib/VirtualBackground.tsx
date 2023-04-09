@@ -10,7 +10,6 @@ export class VirtualBackground{
         this.ss.setOptions({ modelSelection: 1 });
         this.ss.onResults(results=>this.onSsResults(results));
         this.bgImage = new Image();
-        this.bgImage.crossOrigin = "anonymous";
         this.bgImage.src = bgImagePath;
     }
 
@@ -22,7 +21,6 @@ export class VirtualBackground{
             this.sourceWidth = sourceWidth;
             this.sourceHeight = sourceHeight;
             this.targetCanvas = targetCanvas;
-            this.working = true;
             this.currentResolve = resolve;
             this.ss.send({image: image})
                 .catch(err=>{
@@ -35,11 +33,10 @@ export class VirtualBackground{
 
     private onSsResults(results: Results){
         if(!this.sourceWidth || !this.sourceHeight || !this.targetCanvas || !this.currentResolve) return;
-        const c = this.targetCanvas;
         const [x, y, w, h] = getTargetDrawingRect(
-            c,
+            this.targetCanvas,
             {width: this.sourceWidth, height: this.sourceHeight});
-        const ctx = c.getContext("2d")!;
+        const ctx = this.targetCanvas.getContext("2d")!;
         ctx.save();
         ctx.clearRect(0, 0, w + x, h + y);
         ctx.drawImage(results.segmentationMask, x, y, w, h);
@@ -53,7 +50,6 @@ export class VirtualBackground{
     }
 
     private enabled = true;
-    private working = false;
     private currentResolve: ((value:void)=>void) | null = null;
     private ss: SelfieSegmentation;
     private bgImage: HTMLImageElement;
