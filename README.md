@@ -21,3 +21,7 @@ export const skyWayRoomId = "YOUR_ROOM_ID"; // 同じskyWayKeyとskyWayRoomIdを
 yarn install
 yarn start
 ```
+
+## 動作画面イメージ
+
+[!screen](react-skyway-sample.png)
