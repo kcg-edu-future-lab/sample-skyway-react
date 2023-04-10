@@ -24,4 +24,4 @@ yarn start
 
 ## 動作画面イメージ
 
-[!screen](react-skyway-sample.png)
+![screen](react-skyway-sample.png)
