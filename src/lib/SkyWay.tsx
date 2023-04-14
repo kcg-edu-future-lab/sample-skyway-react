@@ -16,7 +16,7 @@ class WebRtcEvents extends EventTarget{
     protected fire(type: "peerStreamArrived", detail: PeerStreamArrivedEventDetail): void;
     protected fire(type: "peerStreamLeaved", detail: PeerStreamLeavedEventDetail): void;
     protected fire(type: string, detail: object){
-        this.dispatchEvent(new CustomEvent(type, {detail: detail}));
+        this.dispatchEvent(new CustomEvent(type, {detail}));
     }
 }
 

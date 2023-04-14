@@ -11,7 +11,7 @@ class MyMediaEvents extends EventTarget{
     }
     protected fire(type: "streamAvailable", detail: StreamAvailableEventDetail): void;
     protected fire(type: string, detail: object){
-        this.dispatchEvent(new CustomEvent(type, {detail: detail}));
+        this.dispatchEvent(new CustomEvent(type, {detail}));
     }
 }
 
