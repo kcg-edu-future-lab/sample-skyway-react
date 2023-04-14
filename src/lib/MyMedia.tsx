@@ -1,21 +1,21 @@
 import { getTargetDrawingRect } from "./DrawUtil";
 import { VirtualBackground } from "./VirtualBackground";
 
-class StreamAvailableEvent extends CustomEvent<{stream: MediaStream}>{
-    constructor(stream: MediaStream){
-        super("streamAvailable", {detail: {stream}});
-    }
+interface StreamAvailableEventDetail{
+    stream: MediaStream;
 }
-interface StreamAvailableEventListener{
-    (detail: {stream: MediaStream}): void;
-}
-class StreamEvents extends EventTarget{
-    on(type: "streamAvailable", callback: StreamAvailableEventListener): void {
+class MyMediaEvents extends EventTarget{
+    on(type: "streamAvailable", callback: (detail: StreamAvailableEventDetail)=>void): void;
+    on(type: string, callback: Function): void {
         super.addEventListener(type, e=>callback((e as any).detail));
+    }
+    protected fire(type: "streamAvailable", detail: StreamAvailableEventDetail): void;
+    protected fire(type: string, detail: object){
+        this.dispatchEvent(new CustomEvent(type, {detail: detail}));
     }
 }
 
-export class MyMedia extends StreamEvents{
+export class MyMedia extends MyMediaEvents{
     constructor(){
         super();
         this.vb = new VirtualBackground();
@@ -69,7 +69,7 @@ export class MyMedia extends StreamEvents{
                         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                         s.addTrack(this.canvasStream.getVideoTracks()[0]);
                     }
-                    this.dispatchEvent(new StreamAvailableEvent(s))
+                    this.fire("streamAvailable", {stream: s});
                 })
                 .catch(console.error);
         } else{
@@ -83,7 +83,7 @@ export class MyMedia extends StreamEvents{
             const t = (dst as any).stream.getAudioTracks()[0];
             s.addTrack(t);
             s.addTrack(this.canvasStream.getVideoTracks()[0]);
-            this.dispatchEvent(new StreamAvailableEvent(s))
+            this.fire("streamAvailable", {stream: s});
         }
     }
 
