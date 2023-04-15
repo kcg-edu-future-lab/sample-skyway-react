@@ -21,7 +21,7 @@ export default function App() {
 
         if(myMedia.current) return;
         const mm = new MyMedia();
-        mm.on("streamAvailable", ({stream})=>{
+        mm.on("streamUpdated", ({stream})=>{
             setMyStream(stream);
             if(!skyWay.current){
                 const sw = new SkyWay();

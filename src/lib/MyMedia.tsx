@@ -1,15 +1,15 @@
 import { getTargetDrawingRect } from "./DrawUtil";
 import { VirtualBackground } from "./VirtualBackground";
 
-interface StreamAvailableEventDetail{
+interface StreamUpdatedEventDetail{
     stream: MediaStream;
 }
 class MyMediaEvents extends EventTarget{
-    on(type: "streamAvailable", callback: (detail: StreamAvailableEventDetail)=>void): void;
+    on(type: "streamUpdated", callback: (detail: StreamUpdatedEventDetail)=>void): void;
     on(type: string, callback: Function): void {
         super.addEventListener(type, e=>callback((e as any).detail));
     }
-    protected fire(type: "streamAvailable", detail: StreamAvailableEventDetail): void;
+    protected fire(type: "streamUpdated", detail: StreamUpdatedEventDetail): void;
     protected fire(type: string, detail: object){
         this.dispatchEvent(new CustomEvent(type, {detail}));
     }
@@ -69,7 +69,7 @@ export class MyMedia extends MyMediaEvents{
                         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                         s.addTrack(this.canvasStream.getVideoTracks()[0]);
                     }
-                    this.fire("streamAvailable", {stream: s});
+                    this.fire("streamUpdated", {stream: s});
                 })
                 .catch(console.error);
         } else{
@@ -83,7 +83,7 @@ export class MyMedia extends MyMediaEvents{
             const t = (dst as any).stream.getAudioTracks()[0];
             s.addTrack(t);
             s.addTrack(this.canvasStream.getVideoTracks()[0]);
-            this.fire("streamAvailable", {stream: s});
+            this.fire("streamUpdated", {stream: s});
         }
     }
 
