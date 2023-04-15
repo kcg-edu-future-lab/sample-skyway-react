@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 interface Props{
     stream: MediaStream | null;
 }
-const SelfVideo = ({stream}: Props)=>{
+export default function SelfVideo({stream}: Props){
     const myVideo = useRef<HTMLVideoElement>(null);
 
     const refFirst = useRef(true);
@@ -27,6 +27,4 @@ const SelfVideo = ({stream}: Props)=>{
         <video ref={myVideo} width="100%" height="100%"
             style={{ display: "inline-block" }} autoPlay playsInline muted />
     </div>;
-};
-
-export default SelfVideo;
+}

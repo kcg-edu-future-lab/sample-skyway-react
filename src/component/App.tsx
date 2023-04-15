@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
+import { useEffect, useRef, useState } from 'react';
 import { skyWayKey, skyWayRoomId } from '../keys';
 import { SkyWay } from '../lib/SkyWay';
 import { MyMedia } from '../lib/MyMedia';
 import SelfVideo from './SelfVideo';
 import OtherVideo from './OtherVideo';
+import './App.css';
 
-function App() {
+export default function App() {
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
     const [peers, setPeers] = useState<{peerId: string, stream: MediaStream}[]>([]);
     const skyWay = useRef<SkyWay>();
@@ -51,5 +51,3 @@ function App() {
         </div>
     </div>;
 }
-
-export default App;
