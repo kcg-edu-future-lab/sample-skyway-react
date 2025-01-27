@@ -1,53 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
-import { skyWayKey, skyWayRoomId } from '../keys';
-import { SkyWay } from '../lib/SkyWay';
-import { MyMedia } from '../lib/MyMedia';
-import SelfVideo from './SelfVideo';
-import OtherVideo from './OtherVideo';
 import './App.css';
+import { UserStreamManager } from '../lib/UserStreamManager';
+import { skyWayId, skyWayRoomId, skyWaySecret } from '../keys';
+import { SkyWay } from '../lib/SkyWay';
+import SelfVideo from './SelfVideo';
+
+const usm = new UserStreamManager();
+const skyway = new SkyWay();
+
+window.addEventListener("load", async ()=>{
+    usm.on("streamCreated", ({stream})=>{
+        skyway.start(skyWayId, skyWaySecret, skyWayRoomId, stream);
+    });
+    usm.on("streamDestroyed", ()=>{
+//        skyway.stop();
+    });
+});
 
 export default function App() {
-    const [myStream, setMyStream] = useState<MediaStream | null>(null);
-    const [peers, setPeers] = useState<{peerId: string, stream: MediaStream}[]>([]);
-    const skyWay = useRef<SkyWay>();
-    const myMedia = useRef<MyMedia>();
-
-    const refFirst = useRef(true);
-    useEffect(()=>{
-        if(process.env.NODE_ENV === "development" && refFirst.current){
-            refFirst.current = false;
-            return;
-        }
-
-        if(myMedia.current) return;
-        const mm = new MyMedia();
-        mm.on("streamUpdated", ({stream})=>{
-            setMyStream(stream);
-            if(!skyWay.current){
-                const sw = new SkyWay();
-                sw.on("peerStreamArrived", ({peerId, stream})=>{
-                    setPeers([...peers, {peerId: peerId, stream: stream}]);
-                });
-                sw.on("peerStreamLeaved", ({peerId})=>{
-                    setPeers(peers.filter(s=>s.peerId!==peerId));
-                });
-                sw.start(skyWayKey, skyWayRoomId, stream);
-                skyWay.current = sw;
-            } else{
-                skyWay.current.replaceStream(stream);
-            }
-        });
-        mm.setStates(false, false);
-        myMedia.current = mm;
-    });
-
     return <div className="App">
         あなた
-        <label><input onChange={e=>myMedia.current!.setCameraState(e.target.checked)} type="checkbox" />カメラ</label>
-        <label><input onChange={e=>myMedia.current!.setMicState(e.target.checked)} type="checkbox" />マイク</label>
+        <label><input onChange={e=>usm.setCameraState(e.currentTarget.checked)} type="checkbox" />カメラ</label>
+        <label><input onChange={e=>usm.setMicState(e.currentTarget.checked)} type="checkbox" />マイク</label>
         <div style={{verticalAlign: "top", backgroundColor: "black", width: "100%"}}>
-            <SelfVideo stream={myStream} />
-            { peers.map(p=><OtherVideo key={p.peerId} stream={p.stream} />) }
+            <SelfVideo myMedia={usm} />
         </div>
     </div>;
 }

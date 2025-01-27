@@ -1,21 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { UserStreamManager } from "../lib/UserStreamManager";
 
 interface Props{
-    stream: MediaStream | null;
+    myMedia: UserStreamManager;
 }
-export default function SelfVideo({stream}: Props){
+export default function SelfVideo({myMedia}: Props){
     const myVideo = useRef<HTMLVideoElement>(null);
-
-    const refFirst = useRef(true);
-    useEffect(()=>{
-        if (process.env.NODE_ENV === "development" && refFirst.current) {
-            refFirst.current = false;
+    myMedia.on("streamCreated", ({stream})=>{
+        console.log("myVideo.current", myVideo.current);
+        if(myVideo.current == null){
+            console.error("myVideo.current is null.");
             return;
         }
-        if(!myVideo.current) return;
-        if(!stream) return;
-
-        // 自分の映像と音声を再生するvideoタグに関連づける
         const s = new MediaStream();
         stream.getVideoTracks().forEach(t=>s.addTrack(t));
         myVideo.current.srcObject = s;
