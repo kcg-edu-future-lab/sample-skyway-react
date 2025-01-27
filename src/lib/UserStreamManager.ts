@@ -1,4 +1,3 @@
-import { getTargetDrawingRect } from "./DrawUtil";
 import { VirtualBackground } from "./VirtualBackground";
 
 interface StreamCreatedEventDetail{
