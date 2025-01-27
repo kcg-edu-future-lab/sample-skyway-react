@@ -5,7 +5,6 @@ import { SkyWayContext, UserMediaStreamManagerContext, VirtualBackgroundStreamMa
 import { Peer } from './Peer';
 import { HorizontalVideoPanel } from './HorizontalVideoPanel';
 import { skyWayId, skyWayRoomId, skyWaySecret } from '../keys';
-import { Stream } from 'stream';
 
 export default function App() {
     const umsm = useContext(UserMediaStreamManagerContext);
@@ -23,7 +22,6 @@ export default function App() {
             console.log(`SkyWayに接続しました。IDは${selfPeerId}です。`);
         });
         skyway.on("peerStreamArrived", ({peerId, track, type})=>{
-            const remoteMediaArea = document.getElementById("remote-media-area") as HTMLDivElement;
             console.log(`stream of ${peerId} arrived.`, track);
             let found = false;
             const ret = peers.map(p=>{
