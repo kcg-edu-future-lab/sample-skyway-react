@@ -23,24 +23,26 @@ export default function App() {
         });
         skyway.on("peerStreamArrived", ({peerId, track, type})=>{
             console.log(`stream of ${peerId} arrived.`, track);
-            let found = false;
-            const ret = peers.map(p=>{
-                if(p.peerId === peerId){
-                    found = true;
-                    const stream = new MediaStream();
-                    p.stream.getTracks().forEach(t=>stream.addTrack(t));
-                    stream.addTrack(track);
-                    return {peerId, stream};
+            setPeers(peers=>{
+                let found = false;
+                const ret = peers.map(p=>{
+                    if(p.peerId === peerId){
+                        found = true;
+                        const stream = new MediaStream();
+                        p.stream.getTracks().forEach(t=>stream.addTrack(t));
+                        stream.addTrack(track);
+                        return {peerId, stream};
+                    }
+                    return p;
+                });
+                if(found){
+                    return [...ret];
+                } else{
+                    const ms = new MediaStream();
+                    ms.addTrack(track);
+                    return [...peers, {peerId, stream: ms}];
                 }
-                return p;
             });
-            if(found){
-                setPeers([...ret]);
-            } else{
-                const ms = new MediaStream();
-                ms.addTrack(track);
-                setPeers([...peers, {peerId, stream: ms}]);
-            }
         });
         skyway.on("peerLeaved", ({peerId})=>{
             console.log(`${peerId}が退室しました。`);
