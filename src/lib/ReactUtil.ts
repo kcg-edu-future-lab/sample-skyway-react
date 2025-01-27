@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useEffectOnce(effect: ()=>void){
+export function useEffectOnce(effect: ()=>((()=>void) | void)){
     const first = useRef(true);
     useEffect(()=>{
         if(!first.current) return;
         first.current = false;
-        effect();
+        return effect();
     }, []);
 }
 
-export function useInstance<T>(factory: ()=>T): T | null{
+export function useStaticInstance<T>(factory: ()=>T): T | null{
     const [client, setClient] = useState<T | null>(null);
     useEffectOnce(()=>{
         setClient(factory());
@@ -22,12 +22,12 @@ type NonNullables<T extends unknown[]> =
     [NonNullable<U>, ...NonNullables<V>] :
     NonNullable<T>;
 export function useEffectAfterInstancesReady<T extends unknown[]>(
-        depends: [...T], effect: (...arg: NonNullables<T>)=>void){
+        depends: [...T], effect: (...arg: NonNullables<T>)=>((()=>void) | void)){
     const first = useRef(true);
     useEffect(()=>{
         if(!first.current) return;
         if(depends.filter(d=>d===null).length > 0) return;
         first.current = false;
-        effect(...(depends as NonNullables<T>));
-    });
+        return effect(...(depends as NonNullables<T>));
+    }, []);
 }

@@ -1,20 +1,31 @@
 import { LocalAudioStream, LocalStream, LocalVideoStream, RemoteAudioStream, RemoteVideoStream, RoomPublication, SkyWayAuthToken, SkyWayContext, SkyWayRoom, SkyWayStreamFactory, nowInSec, uuidV4 } from "@skyway-sdk/room";
 
+interface ConnectedDetail{
+    selfPeerId: string;
+}
 interface PeerStreamArrivedEventDetail{
     peerId: string;
-    stream: MediaStream;
+    track: MediaStreamTrack;
+    type: "audio" | "video";
 }
 interface PeerStreamLeavedEventDetail{
     peerId: string;
 }
+interface PeerLeavedDetail{
+    peerId: string;
+}
 class WebRtcEvents extends EventTarget{
+    on(type: "connected", callbask: (detail: ConnectedDetail)=>void): void;
     on(type: "peerStreamArrived", callback: (detail: PeerStreamArrivedEventDetail)=>void): void;
     on(type: "peerStreamLeaved", callback: (detail: PeerStreamLeavedEventDetail)=>void): void;
+    on(type: "peerLeaved", callback: (detail: PeerLeavedDetail)=>void): void;
     on(type: string, callback: Function): void {
         super.addEventListener(type, e=>callback((e as CustomEvent).detail));
     }
+    protected fire(type: "connected", detail: ConnectedDetail): void;
     protected fire(type: "peerStreamArrived", detail: PeerStreamArrivedEventDetail): void;
     protected fire(type: "peerStreamLeaved", detail: PeerStreamLeavedEventDetail): void;
+    protected fire(type: "peerLeaved", detail: PeerLeavedDetail): void;
     protected fire(type: string, detail: object){
         this.dispatchEvent(new CustomEvent(type, {detail}));
     }
@@ -29,7 +40,7 @@ export class SkyWay extends WebRtcEvents{
         window.addEventListener("beforeunload", ()=>{
             me.leave();
         });
-        console.log(`SkyWayに接続しました。IDは${me.id}です。`);
+        this.fire("connected", {selfPeerId: me.id});
 
         const audio = new LocalAudioStream(selfStream.getAudioTracks()[0], {stopTrackWhenDisabled: true});
         const video = new LocalVideoStream(selfStream.getVideoTracks()[0], {stopTrackWhenDisabled: true});
@@ -38,37 +49,19 @@ export class SkyWay extends WebRtcEvents{
       
         // 他のユーザのpublicationをsubscribeする
         const subscribeAndAttach = async (publication: RoomPublication<LocalStream>) => {
-            const remoteMediaArea = document.getElementById("remote-media-area") as HTMLDivElement;
             const publisherId = publication.publisher.id;
             if (publisherId === me.id) return;
-            console.log(`publisher: ${publisherId} arrived. try to subscribe`);
             const { stream } = await me.subscribe(publication.id);
-            let newMedia; // 3-2-2
             if(stream instanceof RemoteVideoStream || stream instanceof RemoteAudioStream){
-                switch (stream.track.kind) {
-                    case "video":
-                        newMedia = document.createElement("video");
-                        newMedia.playsInline = true;
-                        break;
-                    case "audio":
-                        newMedia = document.createElement("audio");
-                        newMedia.controls = true;
-                        break;
-                    default:
-                      return;
-                }
-                newMedia.autoplay = true;
-            } else{
-                return;
+                this.fire("peerStreamArrived", {
+                    peerId: publisherId, track: stream.track, type: stream.contentType});
             }
-            stream.attach(newMedia); // 3-2-3
-            remoteMediaArea.appendChild(newMedia);
         };
         room.publications.forEach(subscribeAndAttach);
         room.onStreamPublished.add((e) => subscribeAndAttach(e.publication));
         room.onMemberLeft.add((e) => {
             if (e.member.id === me.id) return;
-            console.log(`${e.member.id}が退室しました。`);
+            this.fire("peerLeaved", {peerId: e.member.id});
         });
     }
 

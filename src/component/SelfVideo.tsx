@@ -1,20 +1,24 @@
 import { useRef } from "react";
-import { UserStreamManager } from "../lib/UserStreamManager";
+import { StreamManager } from "../lib/StreamManagers";
+import { useEffectOnce } from "../lib/ReactUtil";
 
 interface Props{
-    myMedia: UserStreamManager;
+    sm: StreamManager;
 }
-export default function SelfVideo({myMedia}: Props){
-    const myVideo = useRef<HTMLVideoElement>(null);
-    myMedia.on("streamCreated", ({stream})=>{
-        console.log("myVideo.current", myVideo.current);
-        if(myVideo.current == null){
-            console.error("myVideo.current is null.");
-            return;
-        }
-        const s = new MediaStream();
-        stream.getVideoTracks().forEach(t=>s.addTrack(t));
-        myVideo.current.srcObject = s;
+export default function SelfVideo({sm}: Props){
+    const myVideo = useRef<HTMLVideoElement>(null!);
+
+    useEffectOnce(()=>{
+        sm.on("streamCreated", ({stream})=>{
+            console.log("myVideo.current", myVideo.current);
+            if(myVideo.current == null){
+                console.error("myVideo.current is null.");
+                return;
+            }
+            const s = new MediaStream();
+            stream.getVideoTracks().forEach(t=>s.addTrack(t));
+            myVideo.current.srcObject = s;
+        });
     });
 
     return <div style={{

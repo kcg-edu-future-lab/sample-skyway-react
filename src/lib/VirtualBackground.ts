@@ -1,8 +1,7 @@
 import { InputImage, Results, SelfieSegmentation } from "@mediapipe/selfie_segmentation";
-import bgImagePath from "./defaultBackground.png";
 
 export class VirtualBackground{
-    constructor(){
+    constructor(bgImagePath: string){
         this.ss = new SelfieSegmentation({
             locateFile: (file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
         });

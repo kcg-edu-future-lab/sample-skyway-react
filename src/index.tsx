@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { createContext } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './component/App';
 import reportWebVitals from './reportWebVitals';
+import { UserMediaStreamManager, VirtualBackgroundStreamManager } from './lib/StreamManagers';
+import { SkyWay } from './lib/SkyWay';
+import vbImagePath from './defaultBackground.png';
 
-const root = ReactDOM.createRoot(
+export const UserMediaStreamManagerContext = createContext(new UserMediaStreamManager());
+export const VirtualBackgroundStreamManagerContext = createContext(new VirtualBackgroundStreamManager(vbImagePath));
+export const SkyWayContext = createContext(new SkyWay());
+
+ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
-);
-root.render(
+).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
