@@ -12,7 +12,8 @@ Reactで開発したビデオ会議のサンプルプログラムです。仮想
 
 [SkyWay](https://console-webrtc-free.ecl.ntt.com/users/login)にユーザ登録してキーを発行し，srcディレクトリに`keys.ts`という名前のファイルを作成して以下の内容を書き込んでください。
 ```
-export const skyWayKey = "YOUR_API_KEY";
+export const skyWayId =  "YOUR_APP_ID";
+export const skyWaySecret =  "YOUR_API_KEY";    
 export const skyWayRoomId = "YOUR_ROOM_ID"; // 同じskyWayKeyとskyWayRoomIdを使用しているアプリケーションが接続されます。
 ```
 次に以下のコマンドを実行すると，アプリケーションが起動します。
